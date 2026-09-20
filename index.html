@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>อร่อยไทยวันนี้</title>
+<style>
+  :root {
+    --gold: #c9a227;
+    --gold-dark: #a3811a;
+    --red: #b23a2e;
+    --green: #145a32;
+    --cream: #fdf6e3;
+    --card-bg: #ffffff;
+    --text: #3a2a1a;
+    --muted: #8a7660;
+    --shadow: 0 6px 18px rgba(178, 58, 46, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Sarabun", "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, var(--cream) 0%, #fbeecb 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 20px;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    color: var(--red);
+  }
+
+  header p {
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .spotlight {
+    background: linear-gradient(135deg, var(--red), var(--gold-dark));
+    color: #fff;
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    margin-bottom: 36px;
+    cursor: pointer;
+  }
+
+  .spotlight .label {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    opacity: 0.85;
+  }
+
+  .spotlight .emoji {
+    font-size: 4rem;
+    margin: 12px 0;
+  }
+
+  .spotlight .emoji img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+
+  .spotlight .name {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 4px 0;
+  }
+
+  .spotlight .desc {
+    opacity: 0.95;
+    max-width: 480px;
+    margin: 8px auto 20px;
+  }
+
+  .reroll-btn {
+    background: #fff;
+    color: var(--red);
+    border: none;
+    border-radius: 999px;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.15s ease;
+  }
+
+  .reroll-btn:hover { transform: translateY(-2px); }
+  .reroll-btn:active { transform: translateY(0); }
+
+  section h2 {
+    color: var(--green);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .dish-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: relative;
+    border: 2px solid transparent;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .dish-card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+  }
+
+  .dish-card.today {
+    border-color: var(--gold);
+  }
+
+  .today-badge {
+    position: absolute;
+    top: -10px;
+    left: 14px;
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: bold;
+  }
+
+  .dish-card .card-emoji {
+    font-size: 2.4rem;
+  }
+
+  .dish-card .card-emoji img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .dish-card .card-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 8px 0 4px;
+  }
+
+  .dish-card .card-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    min-height: 40px;
+  }
+
+  .fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    filter: grayscale(1);
+    opacity: 0.5;
+    transition: opacity 0.15s ease, filter 0.15s ease, transform 0.15s ease;
+  }
+
+  .fav-btn.active {
+    filter: none;
+    opacity: 1;
+  }
+
+  .fav-btn:active { transform: scale(1.2); }
+
+  .favorites-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .fav-chip {
+    background: var(--card-bg);
+    border: 1px solid #eee0c0;
+    border-radius: 999px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: background 0.15s ease;
+  }
+
+  .fav-chip:hover {
+    background: #fff3d6;
+  }
+
+  .fav-chip .remove {
+    color: var(--red);
+    font-weight: bold;
+  }
+
+  .empty-msg {
+    color: var(--muted);
+    font-style: italic;
+    padding: 12px 0 30px;
+  }
+
+  .filter-bar {
+    margin-bottom: 18px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #eee0c0;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+    margin-bottom: 12px;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip-btn {
+    background: #fff;
+    border: 1px solid #eee0c0;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .chip-btn:hover {
+    background: #fff3d6;
+  }
+
+  .chip-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #fff;
+    font-weight: bold;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .dish-card {
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍜 อร่อยไทยวันนี้</h1>
+  <p>สุ่มเมนูอาหารไทยประจำวัน แล้วเก็บเมนูโปรดของคุณไว้</p>
+</header>
+
+<main>
+  <section class="spotlight" id="spotlight">
+    <div class="label">เมนูวันนี้</div>
+    <div class="emoji" id="spotlight-emoji"></div>
+    <div class="name" id="spotlight-name"></div>
+    <div class="desc" id="spotlight-desc"></div>
+    <button class="reroll-btn" id="reroll-btn">🎲 สุ่มอาหารไทยวันนี้</button>
+  </section>
+
+  <section>
+    <h2>เมนูโปรดของฉัน</h2>
+    <div class="favorites-list" id="favorites-list"></div>
+    <p class="empty-msg" id="favorites-empty">ยังไม่มีเมนูโปรด ลองกดหัวใจที่เมนูที่ชอบดูสิ!</p>
+  </section>
+
+  <section>
+    <h2>เมนูอาหารไทยทั้งหมด</h2>
+    <div class="filter-bar">
+      <input type="text" class="search-input" id="search-input" placeholder="ค้นหาเมนู เช่น ผัดไทย หรือ pad thai...">
+      <div class="category-chips" id="category-chips"></div>
+    </div>
+    <div class="gallery" id="gallery"></div>
+    <p class="empty-msg" id="gallery-empty" style="display:none;">ไม่พบเมนูที่ตรงกับคำค้นหาหรือหมวดหมู่ที่เลือก</p>
+  </section>
+</main>
+
+<footer>ทำด้วยความหิว 🍚</footer>
+
+<script src="dishes.js"></script>
+<script>
+(function () {
+  const DISH_OF_DAY_KEY = "thaiFood.dishOfDay";
+  const FAVORITES_KEY = "thaiFood.favorites";
+
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function findDish(id) {
+    return DISHES.find(function (d) { return d.id === id; });
+  }
+
+  function randomDishId(excludeId) {
+    const pool = excludeId ? DISHES.filter(function (d) { return d.id !== excludeId; }) : DISHES;
+    const source = pool.length ? pool : DISHES;
+    return source[Math.floor(Math.random() * source.length)].id;
+  }
+
+  function loadDishOfDay() {
+    let stored = null;
+    try {
+      stored = JSON.parse(localStorage.getItem(DISH_OF_DAY_KEY));
+    } catch (e) {}
+
+    if (stored && stored.date === todayStr() && findDish(stored.dishId)) {
+      return stored.dishId;
+    }
+
+    const dishId = randomDishId(stored ? stored.dishId : null);
+    saveDishOfDay(dishId);
+    return dishId;
+  }
+
+  function saveDishOfDay(dishId) {
+    localStorage.setItem(DISH_OF_DAY_KEY, JSON.stringify({ date: todayStr(), dishId: dishId }));
+  }
+
+  function loadFavorites() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(FAVORITES_KEY));
+      return Array.isArray(arr) ? arr.filter(function (id) { return !!findDish(id); }) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveFavorites(favs) {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+  }
+
+  let dishOfDayId = loadDishOfDay();
+  let favorites = loadFavorites();
+  saveFavorites(favorites);
+
+  let searchQuery = "";
+  let activeCategory = "ทั้งหมด";
+
+  function matchesFilter(dish) {
+    if (activeCategory !== "ทั้งหมด" && dish.category !== activeCategory) return false;
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    const haystack = (dish.name + " " + dish.desc + " " + dish.id.replace(/-/g, " ")).toLowerCase();
+    return haystack.indexOf(q) !== -1;
+  }
+
+  function toggleFavorite(dishId) {
+    const idx = favorites.indexOf(dishId);
+    if (idx === -1) {
+      favorites.push(dishId);
+    } else {
+      favorites.splice(idx, 1);
+    }
+    saveFavorites(favorites);
+    render();
+  }
+
+  function reroll() {
+    dishOfDayId = randomDishId(dishOfDayId);
+    saveDishOfDay(dishOfDayId);
+    render();
+  }
+
+  function renderSpotlight() {
+    const dish = findDish(dishOfDayId);
+    const emojiEl = document.getElementById("spotlight-emoji");
+    emojiEl.innerHTML = dish.image
+      ? '<img src="' + dish.image + '" alt="' + dish.name + '">'
+      : "";
+    if (!dish.image) emojiEl.textContent = dish.emoji;
+    document.getElementById("spotlight-name").textContent = dish.name;
+    document.getElementById("spotlight-desc").textContent = dish.desc;
+  }
+
+  function renderGallery() {
+    const gallery = document.getElementById("gallery");
+    const emptyMsg = document.getElementById("gallery-empty");
+    gallery.innerHTML = "";
+
+    const visibleDishes = DISHES.filter(matchesFilter);
+
+    emptyMsg.style.display = visibleDishes.length === 0 ? "block" : "none";
+
+    visibleDishes.forEach(function (dish) {
+      const isToday = dish.id === dishOfDayId;
+      const isFav = favorites.indexOf(dish.id) !== -1;
+
+      const card = document.createElement("div");
+      card.className = "dish-card" + (isToday ? " today" : "");
+      card.dataset.id = dish.id;
+
+      const emojiHtml = dish.image
+        ? '<img src="' + dish.image + '" alt="' + dish.name + '">'
+        : dish.emoji;
+
+      card.innerHTML =
+        (isToday ? '<span class="today-badge">เมนูวันนี้</span>' : "") +
+        '<button class="fav-btn' + (isFav ? " active" : "") + '" data-id="' + dish.id + '" aria-label="ถูกใจ">❤️</button>' +
+        '<div class="card-emoji">' + emojiHtml + "</div>" +
+        '<div class="card-name">' + dish.name + "</div>" +
+        '<div class="card-desc">' + dish.desc + "</div>";
+
+      gallery.appendChild(card);
+    });
+  }
+
+  function renderCategoryChips() {
+    const container = document.getElementById("category-chips");
+    container.innerHTML = "";
+    CATEGORIES.forEach(function (cat) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip-btn" + (cat === activeCategory ? " active" : "");
+      btn.dataset.category = cat;
+      btn.textContent = cat;
+      container.appendChild(btn);
+    });
+  }
+
+  function renderFavorites() {
+    const list = document.getElementById("favorites-list");
+    const emptyMsg = document.getElementById("favorites-empty");
+    list.innerHTML = "";
+
+    if (favorites.length === 0) {
+      emptyMsg.style.display = "block";
+      return;
+    }
+    emptyMsg.style.display = "none";
+
+    favorites.forEach(function (dishId) {
+      const dish = findDish(dishId);
+      if (!dish) return;
+      const chip = document.createElement("div");
+      chip.className = "fav-chip";
+      chip.dataset.id = dish.id;
+      chip.innerHTML = "<span>" + dish.emoji + " " + dish.name + "</span><span class=\"remove\">✕</span>";
+      list.appendChild(chip);
+    });
+  }
+
+  function render() {
+    renderSpotlight();
+    renderGallery();
+    renderFavorites();
+  }
+
+  document.getElementById("reroll-btn").addEventListener("click", function (e) {
+    e.stopPropagation();
+    reroll();
+  });
+
+  document.getElementById("spotlight").addEventListener("click", function () {
+    window.location.href = "detail.html?id=" + encodeURIComponent(dishOfDayId);
+  });
+
+  document.getElementById("gallery").addEventListener("click", function (e) {
+    const btn = e.target.closest(".fav-btn");
+    if (btn) {
+      toggleFavorite(btn.dataset.id);
+      return;
+    }
+    const card = e.target.closest(".dish-card");
+    if (card) window.location.href = "detail.html?id=" + encodeURIComponent(card.dataset.id);
+  });
+
+  document.getElementById("favorites-list").addEventListener("click", function (e) {
+    const chip = e.target.closest(".fav-chip");
+    if (!chip) return;
+    if (e.target.closest(".remove")) {
+      toggleFavorite(chip.dataset.id);
+      return;
+    }
+    window.location.href = "detail.html?id=" + encodeURIComponent(chip.dataset.id);
+  });
+
+  document.getElementById("search-input").addEventListener("input", function (e) {
+    searchQuery = e.target.value;
+    renderGallery();
+  });
+
+  document.getElementById("category-chips").addEventListener("click", function (e) {
+    const btn = e.target.closest(".chip-btn");
+    if (!btn) return;
+    activeCategory = btn.dataset.category;
+    renderCategoryChips();
+    renderGallery();
+  });
+
+  renderCategoryChips();
+  render();
+})();
+</script>
+
+</body>
+</html>

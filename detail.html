@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>รายละเอียดเมนู - อร่อยไทยวันนี้</title>
+<style>
+  :root {
+    --gold: #c9a227;
+    --gold-dark: #a3811a;
+    --red: #b23a2e;
+    --green: #145a32;
+    --cream: #fdf6e3;
+    --card-bg: #ffffff;
+    --text: #3a2a1a;
+    --muted: #8a7660;
+    --shadow: 0 6px 18px rgba(178, 58, 46, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Sarabun", "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, var(--cream) 0%, #fbeecb 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--red);
+    text-decoration: none;
+    font-weight: bold;
+    margin: 20px 0;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .detail-media {
+    background: linear-gradient(135deg, var(--red), var(--gold-dark));
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 6rem;
+  }
+
+  .detail-media img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .detail-body {
+    padding: 24px 28px 32px;
+  }
+
+  .detail-category {
+    display: inline-block;
+    background: #fff3d6;
+    color: var(--gold-dark);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .detail-name {
+    margin: 4px 0 8px;
+    font-size: 1.6rem;
+    color: var(--red);
+  }
+
+  .detail-desc {
+    color: var(--muted);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+
+  .detail-ingredients-title {
+    margin: 0 0 12px;
+    color: var(--green);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 8px;
+  }
+
+  .detail-ingredients {
+    margin: 0 0 28px;
+    padding-left: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 16px;
+  }
+
+  .detail-ingredients li {
+    font-size: 0.95rem;
+  }
+
+  .fav-toggle-btn {
+    width: 100%;
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .fav-toggle-btn:active { transform: translateY(1px); }
+
+  .fav-toggle-btn.active {
+    background: var(--red);
+  }
+
+  .not-found {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <a class="back-link" href="index.html">← กลับหน้าหลัก</a>
+  <div id="detail-content"></div>
+</main>
+
+<script src="dishes.js"></script>
+<script>
+(function () {
+  const FAVORITES_KEY = "thaiFood.favorites";
+
+  function findDish(id) {
+    return DISHES.find(function (d) { return d.id === id; });
+  }
+
+  function loadFavorites() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(FAVORITES_KEY));
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveFavorites(favs) {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+  }
+
+  function getDishIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("id") || "";
+  }
+
+  const dishId = getDishIdFromUrl();
+  const dish = findDish(dishId);
+  const content = document.getElementById("detail-content");
+
+  if (!dish) {
+    content.innerHTML = '<div class="not-found">ไม่พบเมนูที่ต้องการ</div>';
+    return;
+  }
+
+  let favorites = loadFavorites();
+
+  function isFav() {
+    return favorites.indexOf(dish.id) !== -1;
+  }
+
+  const mediaHtml = dish.image
+    ? '<img src="' + dish.image + '" alt="' + dish.name + '">'
+    : dish.emoji;
+
+  const ingredientsHtml = dish.ingredients
+    .map(function (item) { return "<li>" + item + "</li>"; })
+    .join("");
+
+  content.innerHTML =
+    '<div class="detail-card">' +
+      '<div class="detail-media">' + mediaHtml + "</div>" +
+      '<div class="detail-body">' +
+        '<span class="detail-category">' + dish.category + "</span>" +
+        '<h1 class="detail-name">' + dish.name + "</h1>" +
+        '<p class="detail-desc">' + dish.desc + "</p>" +
+        '<h2 class="detail-ingredients-title">ส่วนประกอบ</h2>' +
+        '<ul class="detail-ingredients">' + ingredientsHtml + "</ul>" +
+        '<button class="fav-toggle-btn" id="fav-toggle-btn"></button>' +
+      "</div>" +
+    "</div>";
+
+  const favBtn = document.getElementById("fav-toggle-btn");
+
+  function renderFavBtn() {
+    const active = isFav();
+    favBtn.textContent = active ? "❤️ ลบออกจากเมนูโปรด" : "🤍 เพิ่มเป็นเมนูโปรด";
+    favBtn.className = "fav-toggle-btn" + (active ? " active" : "");
+  }
+
+  favBtn.addEventListener("click", function () {
+    const idx = favorites.indexOf(dish.id);
+    if (idx === -1) {
+      favorites.push(dish.id);
+    } else {
+      favorites.splice(idx, 1);
+    }
+    saveFavorites(favorites);
+    renderFavBtn();
+  });
+
+  renderFavBtn();
+})();
+</script>
+
+</body>
+</html>

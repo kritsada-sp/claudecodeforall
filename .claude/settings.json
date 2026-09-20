@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "say \"พี่ก้อง Done\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "say -v \"Eddy (English (US))\" \"Need Approve\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

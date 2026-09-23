@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ลงทะเบียนสมาชิก - อร่อยไทยวันนี้</title>
+<style>
+  :root {
+    --gold: #c9a227;
+    --gold-dark: #a3811a;
+    --red: #b23a2e;
+    --green: #145a32;
+    --cream: #fdf6e3;
+    --card-bg: #ffffff;
+    --text: #3a2a1a;
+    --muted: #8a7660;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Sarabun", "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, var(--cream) 0%, #fbeecb 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header { text-align: center; padding: 40px 20px 20px; }
+  header h1 { margin: 0; font-size: 2rem; color: var(--red); }
+  main {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  label { display: block; font-weight: bold; margin: 16px 0 6px; }
+  input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #eee0c0;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text);
+  }
+  input:focus { outline: none; border-color: var(--gold); }
+  .submit-btn {
+    width: 100%;
+    margin-top: 24px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .submit-btn:disabled { opacity: 0.6; cursor: default; }
+  .msg { margin-top: 16px; text-align: center; font-weight: bold; }
+  .msg.ok { color: var(--green); }
+  .msg.err { color: var(--red); }
+  .back-link { display: block; text-align: center; margin-top: 20px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📝 ลงทะเบียนสมาชิก</h1>
+</header>
+
+<main>
+  <div class="card">
+    <form id="register-form">
+      <label for="name">ชื่อ</label>
+      <input type="text" id="name" required>
+
+      <label for="email">อีเมล</label>
+      <input type="email" id="email" required>
+
+      <label for="phone">เบอร์โทร (ไม่บังคับ)</label>
+      <input type="tel" id="phone">
+
+      <button type="submit" class="submit-btn" id="submit-btn">ลงทะเบียน</button>
+      <p class="msg" id="msg"></p>
+    </form>
+  </div>
+  <a class="back-link" href="index.html">&larr; กลับหน้าหลัก</a>
+</main>
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://kreqmckspqjtzzgbsnjk.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_-vriO426paNbtAV1G6gMMQ_KAvg7BIZ";
+
+  const form = document.getElementById("register-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const msg = document.getElementById("msg");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    msg.textContent = "";
+    msg.className = "msg";
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    try {
+      const res = await fetch(SUPABASE_URL + "/rest/v1/members", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ name: name, email: email, phone: phone || null })
+      });
+
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(body.indexOf("duplicate") !== -1 ? "อีเมลนี้ลงทะเบียนแล้ว" : "เกิดข้อผิดพลาด ลองใหม่อีกครั้ง");
+      }
+
+      msg.textContent = "ลงทะเบียนสำเร็จ! ขอบคุณค่ะ/ครับ";
+      msg.className = "msg ok";
+      form.reset();
+    } catch (err) {
+      msg.textContent = err.message;
+      msg.className = "msg err";
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
